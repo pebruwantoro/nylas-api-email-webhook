@@ -20,7 +20,6 @@ const app = express();
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  const challenge = req.query.challenge;
   res.send("Hello World!");
 });
 
@@ -55,7 +54,7 @@ app.get("/webhook/nylas", (req, res) => {
 });
 
 
-app.listen(3000, () => {
-  console.log(`Server listening at http://localhost:3000`);
-  console.log('Webhook endpoint is available at http://localhost:3000/webhook/nylas');
+app.listen(process.env.APP_PORT, () => {
+  console.log(`Server listening at http://localhost:${process.env.APP_PORT}`);
+  console.log(`Webhook endpoint is available at http://localhost:${process.env.APP_PORT}/webhook/nylas`);
 });
