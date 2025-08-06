@@ -1,0 +1,53 @@
+import express from "express";
+import 'dotenv/config';
+import Nylas from "nylas";
+
+const nylasConfig = {
+  clientId: process.env.NYLAS_CLIENT_ID,
+  apiKey: process.env.NYLAS_API_KEY,
+  apiUri: process.env.NYLAS_API_URI,
+};
+
+const nylas = new Nylas({
+  apiKey: nylasConfig.apiKey,
+  apiUri: nylasConfig.apiUri,
+});
+
+
+const app = express();
+
+// Add the express.json() middleware to parse JSON request bodies
+app.use(express.json());
+
+app.get("/", (req, res) => {
+  const challenge = req.query.challenge;
+  res.send("Hello World!");
+});
+
+// This is the endpoint that Nylas will call to send webhook events
+// It should respond with a 200 status code to acknowledge receipt of the event
+// The event data will be in the request body, and you can process it as needed
+app.post("/webhook/nylas", (req, res) => {
+  console.log("event from nylas: ", JSON.stringify(req.body.data));
+
+  return res.status(200).end();
+});
+
+// Verify the webhook by responding to the challenge parameter
+// This is the endpoint that Nylas will call to verify the webhook
+// It should respond with the challenge code sent by Nylas
+// This is typically used when you first set up the webhook
+// and Nylas sends a challenge code to verify the endpoint.
+app.get("/webhook/nylas", (req, res) => {
+  if (req.query.challenge) {
+    console.log(`Received challenge code! - ${req.query.challenge}`);
+
+    return res.send(req.query.challenge);
+  }
+});
+
+
+app.listen(3000, () => {
+  console.log(`Server listening at http://localhost:3000`);
+  console.log('Webhook endpoint is available at http://localhost:3000/webhook/nylas');
+});
