@@ -28,8 +28,16 @@ app.get("/", (req, res) => {
 // It should respond with a 200 status code to acknowledge receipt of the event
 // The event data will be in the request body, and you can process it as needed
 app.post("/webhook/nylas", (req, res) => {
-  console.log("event from nylas: ", JSON.stringify(req.body.data));
-
+  const emailSubject = req.body.data.object.subject;
+  if (emailSubject){
+    console.log('email subject: ', emailSubject);
+    if (emailSubject.toLowerCase().includes('inquiry') || emailSubject.toLowerCase().includes('inquiries')) {
+      console.log("event from email inquiry: ", JSON.stringify(req.body.data));
+    } else {
+      console.log("The email does not contain inquiry or inquiries.");
+    }
+  }
+  
   return res.status(200).end();
 });
 
